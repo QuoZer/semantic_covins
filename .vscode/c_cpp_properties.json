@@ -1,0 +1,31 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${default}",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "/home/appuser/COVINS_demo/devel/include/**",
+                "/opt/ros/noetic/include/**",
+                "/home/appuser/COVINS_demo/src/aslam_cv2/aslam_cv_cameras/include/**",
+                "/home/appuser/COVINS_demo/src/aslam_cv2/aslam_cv_common/include/**",
+                "/home/appuser/COVINS_demo/src/covins/covins_backend/include/**",
+                "/home/appuser/COVINS_demo/src/covins/covins_comm/include/**",
+                "/home/appuser/COVINS_demo/src/vision_opencv/cv_bridge/include/**",
+                "/home/appuser/COVINS_demo/src/eigen_checks/include/**",
+                "/home/appuser/COVINS_demo/src/minkindr/minkindr/include/**",
+                "/home/appuser/COVINS_demo/src/opengv/include/**",
+                "/home/appuser/COVINS_demo/src/robopt_open/include/**",
+                "/usr/include/**",
+                "${workspaceFolder}/src/covins/orb_slam3/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++14"
+        }
+    ],
+    "version": 4
+}

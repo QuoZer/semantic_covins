@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- Starts an additional orb_slam3 node  -->
+
+
+<include file="$(find spot_client)/launch/realsense_bringup.launch" />
+
+<include file="$(find sam_node)/launch/one_node.launch" />
+
+<include file="$(find covins_backend)/launch/add_client.launch" />
+
+
+</launch>

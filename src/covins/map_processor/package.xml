@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package format='2'>
+  <name>map_processor</name>
+  <version>1.0.0</version>
+  <description>map_processor</description>
+  <author>Matvei</author>
+  <maintainer email="someone@gmail.com"> </maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/map_processor</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <depend>rospy</depend>
+  <depend>geometry_msgs</depend>
+
+</package>

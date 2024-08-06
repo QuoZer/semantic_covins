@@ -1,0 +1,14 @@
+<package>
+  <description brief="spot_client">
+
+     spot_client
+
+  </description>
+  <author>Matvei</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/spot_client</url>
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+
+</package>

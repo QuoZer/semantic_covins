@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+
+<arg name="voc" default="/home/appuser/COVINS_demo/voc/ORBvoc.txt" />
+<arg name="cam1" default="/home/appuser/COVINS_demo/src/covins/orb_slam3/Examples/ROS/ORB_SLAM3/launch/config/client1_Intel_D435i_036522070077.yaml" />
+<arg name="cam2" default="/home/appuser/COVINS_demo/src/covins/orb_slam3/Examples/ROS/ORB_SLAM3/launch/config/client2_Intel_D435i_033422070391.yaml" />
+
+<!-- clients -->
+<node pkg="ORB_SLAM3" type="Mono_Inertial" name="ORB_SLAM3_monoi1" args="$(arg voc) $(arg cam1)" output="screen"> 
+    <remap from="/camera/image_raw" to="/client1/camera/infra1/image_rect_raw"/>
+    <remap from="/imu" to="/client1/camera/imu"/>
+</node>
+<node pkg="ORB_SLAM3" type="Mono_Inertial" name="ORB_SLAM3_monoi2" args="$(arg voc) $(arg cam2)" output="screen"> 
+    <remap from="/camera/image_raw" to="/client2/camera/infra1/image_rect_raw"/>
+    <remap from="/imu" to="/client2/camera/imu"/>
+</node>
+
+</launch>

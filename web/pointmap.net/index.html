@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to pointmap.net!</title>
+<script type="text/javascript">
+function timeStamp() {
+    let ver = Math.floor(Date.now() / 1000).toString();
+    var fname = "/imgs/bw_walls.png" + "?version=" + ver;
+    document.getElementById("map_pic").src = fname;
+    // alert('ok');
+}
+window.onload = timeStamp;
+</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .imgbox {
+            display: grid;
+            height: 100%;
+        }
+        .center-fit {
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
+        }
+    </style>
+</head>
+<body style="background-color:black;">
+  <meta http-equiv="refresh" content="2">
+  <!-- <script type="module" src="/js/main.js"></script> -->
+  <div class="imgbox">
+	<img id="map_pic" class="center-fit" src="/imgs/bw_walls.png">
+  </div>
+</body>
+</html>

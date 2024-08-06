@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- <param name="/use_sim_time" value="true" /> -->
+
+<node pkg="sam_node" type="sam_node.py" name="client1_sam">
+    <!-- Inputs  -->
+    <remap from="/camera/image_raw" to="/client1/camera/infra1/image_rect_raw"/>
+    <remap from="/camera/imu" to="/client1/camera/imu"/>
+    <remap from="/camera/imu0" to="/client1/camera/imu"/>
+    <!-- Outputs -->
+    <remap from="/sam_node/dt_imu" to="/client1/sam_node/dt_imu"/>
+    <remap from="/sam_node/imu" to="/client1/sam_node/imu"/>
+    <remap from="/sam_node/mask" to="/client1/sam_node/mask"/>
+    <remap from="/sam_node/image" to="/client1/sam_node/image"/>
+</node>
+
+<node pkg="sam_node" type="sam_node.py" name="client2_sam">
+    <!-- Inputs -->
+    <remap from="/camera/image_raw" to="/client2/camera/infra1/image_rect_raw"/>
+    <remap from="/camera/imu" to="/client2/camera/imu"/>
+    <remap from="/camera/imu0" to="/client2/camera/imu"/>
+    <!-- Outputs -->
+    <remap from="/sam_node/dt_imu" to="/client2/sam_node/dt_imu"/>
+    <remap from="/sam_node/imu" to="/client2/sam_node/imu"/>
+    <remap from="/sam_node/mask" to="/client2/sam_node/mask"/>
+    <remap from="/sam_node/image" to="/client2/sam_node/image"/>
+</node>
+
+<node pkg="sam_node" type="sam_node.py" name="client3_sam">
+    <!-- Inputs -->
+    <remap from="/camera/image_raw" to="/client3/camera/infra1/image_rect_raw"/>
+    <remap from="/camera/imu" to="/client3/camera/imu"/>
+    <remap from="/camera/imu0" to="/client3/camera/imu"/>
+    <!-- Outputs -->
+    <remap from="/sam_node/dt_imu" to="/client3/sam_node/dt_imu"/>
+    <remap from="/sam_node/imu" to="/client3/sam_node/imu"/>
+    <remap from="/sam_node/mask" to="/client3/sam_node/mask"/>
+    <remap from="/sam_node/image" to="/client3/sam_node/image"/>
+</node>
+
+</launch>

@@ -1,0 +1,23 @@
+.git/
+#.vscode/
+.catkin_tools/
+bags/
+build/
+devel/
+logs/
+**/build
+**/lib
+.gitignore
+README.md
+Dockerfile
+run_docker.sh
+build_docker.sh
+**/.cache/*
+**/.cache/
+**/.cache
+**/CMakeCache.txt
+
+# these are not needed at the build process, but usually change
+./src/covins/scripts
+./src/covins/covins_comm/config
+./src/covins/covins_backend/config

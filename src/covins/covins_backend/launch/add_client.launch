@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- Starts an additional orb_slam3 node  -->
+
+<arg name="voc" default="/home/appuser/COVINS_demo/src/covins/orb_slam3/Vocabulary/ORBvoc.txt" />
+<arg name="cam" default="/home/appuser/COVINS_demo/src/covins/orb_slam3/Examples/ROS/ORB_SLAM3/Intel_D435i_042222071807.yaml" />
+
+<node pkg="ORB_SLAM3" type="Mono_Inertial" name="ORB_SLAM3_monoi1" args="$(arg voc) $(arg cam)" output="screen" launch-prefix="bash -c 'sleep 1; $0 $@'"> 
+    <remap from="/camera/image_raw" to="/client1/sam_node/image"/>
+    <remap from="/camera/mask" to="/client1/sam_node/mask"/>
+    <remap from="/imu" to="/client1/camera/imu"/>
+</node>
+
+
+</launch>

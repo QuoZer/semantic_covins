@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- <param name="/use_sim_time" value="true" /> -->
+
+<node pkg="sam_node" type="sam_node.py" name="client1_sam">
+    <!-- Params -->
+    <param name="dataset_path" value="/home/appuser/repos/covins_demo/src/covins/covins_backend/config/objects.yaml" />
+    <param name="segmentation_method" value="vit" />
+    <param name="model_engine_path" value="/home/matvei/repos/covins_demo/semantic_segmentation/shared_data/engine.trt" />
+    <param name="model_weights_path" value="" />
+    <param name="synchronize_outputs" value="False" />
+    <!-- Inputs  -->
+    <remap from="/camera/image_raw" to="/client1/camera/infra1/image_rect_raw"/>
+    <remap from="/camera/imu" to="/client1/camera/imu"/>
+    <remap from="/camera/imu0" to="/client1/camera/imu"/>
+    <!-- Outputs -->
+    <remap from="/sam_node/dt_imu" to="/client1/sam_node/dt_imu"/>
+    <remap from="/sam_node/imu" to="/client1/sam_node/imu"/>
+    <remap from="/sam_node/mask" to="/client1/sam_node/mask"/>
+    <remap from="/sam_node/image" to="/client1/sam_node/image"/>
+</node>
+
+<!-- <node pkg="rosbag" type="play" name="rqt_bag_c1" args="-p client1 /home/appuser/data/shared_data/bags/client2/client_recorded_2024-05-06.03-25-54.bag">
+</node> -->
+
+
+</launch>

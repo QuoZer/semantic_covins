@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+<node name="covins_filtered_cloud_publisher_node" pkg="covins_backend" type="covins_filtered_cloud_publisher_node" />
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find covins_backend)/config/covins_with_clients_3.rviz"/>
+<node pkg="rqt_bag" type="rqt_bag" name="rqt_bag"/>
+</launch>

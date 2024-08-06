@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "ROS: live",
+            "type": "ros",
+            "request": "launch",
+            "target": "/home/appuser/COVINS_demo/src/covins/covins_backend/launch/covins_backend.launch"
+        },
+        {
+            "name": "ROS: recording",
+            "type": "ros",
+            "request": "launch",
+            "target": "/home/appuser/COVINS_demo/src/covins/covins_backend/launch/play_recording_2_client.launch"
+        },
+        {
+            "name": "Python: final_trajectory_from_bag_to_csv",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/appuser/COVINS_demo/src/covins/scripts/final_trajectory_from_bag_to_csv.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "/home/appuser/COVINS_demo/bags/6_covins_output_2023-03-10.01-51-59.bag",
+                "/home/appuser/COVINS_demo/src/covins/scripts/results",
+                "/covins_markers_be",
+                "/covins_trajectories"
+            ]
+        }
+    ]
+}

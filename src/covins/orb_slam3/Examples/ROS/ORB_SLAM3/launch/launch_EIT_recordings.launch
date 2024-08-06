@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+<arg name="bag1" default="/home/appuser/COVINS_demo/bags/2024.05.06_EIT/client1/client_recorded_2024-05-06.03-44-00.bag" />
+<arg name="bag2" default="/home/appuser/COVINS_demo/bags/2024.05.06_EIT/client2/client_recorded_2024-05-06.03-44-02.bag" />
+
+<!-- bags -->
+<node pkg="rosbag" type="play" name="player1" output="screen" args="--clock $(arg bag1) /camera/imu:=/client1/camera/imu /camera/infra1/image_rect_raw:=/client1/camera/infra1/image_rect_raw"/>
+
+<node pkg="rosbag" type="play" name="player2" output="screen" args="--clock $(arg bag2) /camera/imu:=/client2/camera/imu /camera/infra1/image_rect_raw:=/client2/camera/infra1/image_rect_raw"/>
+
+</launch>

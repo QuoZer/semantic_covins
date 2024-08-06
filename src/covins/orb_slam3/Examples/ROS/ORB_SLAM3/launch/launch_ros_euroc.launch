@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+
+<arg name="voc" default="/home/deva/work/COVINS/src/covins/orb_slam3/Vocabulary/ORBvoc.txt" />
+<arg name="cam" default="/home/deva/work/COVINS/src/covins/orb_slam3/Examples/ROS/ORB_SLAM3/Intel_D435i_042222071807.yaml" />
+
+
+<node pkg="ORB_SLAM3" type="Mono_Inertial" name="ORB_SLAM3_monoi0" args="$(arg voc) $(arg cam)" output="screen"> 
+
+    <remap from="/camera/image_raw" to="/camera/infra1/image_rect_raw"/>
+    <remap from="/imu" to="/camera/imu"/>
+
+</node>
+
+</launch>

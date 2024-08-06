@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+<node name="floorplan_extraction_node" pkg="map_processor" type="floorplan_extraction_node.py" output="screen">
+    <!-- <remap from="/slam/raw_map" to="/covins_cloud_be"/> -->
+    <remap from="/slam/raw_map" to="/covins_cloud_labeled"/>
+    <remap from="/slam/esdf" to="/voxblox_node/esdf_pointcloud"/>
+    <remap from="/slam/state" to="/covins_backend_node/processing_state"/>
+
+    <param name="dataset_path" value="/home/appuser/COVINS_demo/src/covins/covins_backend/config/objects.yaml" />
+
+</node>
+
+</launch>

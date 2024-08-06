@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- <param name="/use_sim_time" value="true" /> -->
+
+<node pkg="sam_node" type="sam_node.py" name="client1_sam" output="screen">
+    <!-- Inputs  -->
+    <remap from="/camera/image_raw" to="/client1/camera/infra1/image_rect_raw"/>
+    <remap from="/camera/imu" to="/client1/camera/imu"/>
+    <remap from="/camera/imu0" to="/client1/camera/imu"/>
+    <!-- Outputs -->
+    <remap from="/sam_node/dt_imu" to="/client1/sam_node/dt_imu"/>
+    <remap from="/sam_node/imu" to="/client1/sam_node/imu"/>
+    <remap from="/sam_node/mask" to="/client1/sam_node/mask"/>
+    <remap from="/sam_node/image" to="/client1/sam_node/image"/>
+</node>
+
+
+<node pkg="sam_node" type="sam_node.py" name="client2_sam">
+    <!-- Inputs -->
+    <remap from="/camera/image_raw" to="/client2/camera/infra1/image_rect_raw"/>
+    <remap from="/camera/imu" to="/client2/camera/imu"/>
+    <remap from="/camera/imu0" to="/client2/camera/imu"/>
+    <!-- Outputs -->
+    <remap from="/sam_node/dt_imu" to="/client2/sam_node/dt_imu"/>
+    <remap from="/sam_node/imu" to="/client2/sam_node/imu"/>
+    <remap from="/sam_node/mask" to="/client2/sam_node/mask"/>
+    <remap from="/sam_node/image" to="/client2/sam_node/image"/>
+</node>
+
+<node pkg="rosbag" type="play" name="rqt_bag_c1" args="-p client1  /home/appuser/data/shared_data/bags/client1/client_recorded_2024-05-06.03-25-52.bag" />
+<!-- <node pkg="rosbag" type="play" name="rqt_bag_c1" args="-p client1  /home/appuser/data/shared_data/bags/client2/client_recorded_2024-05-06.03-25-54.bag" />  -->
+
+<!-- <node pkg="rosbag" type="play" name="rqt_bag_c2" args="-p client2  /home/appuser/data/shared_data/bags/client1/client_recorded_2024-05-06.03-44-00.bag" />   -->
+<!-- Long counter-clockwise with a loop in the conference room -->
+<!-- <node pkg="rosbag" type="play" name="rqt_bag_c2" args="-p client1  /home/appuser/data/shared_data/bags/client2/client_recorded_2024-05-06.03-44-02.bag" />   -->
+
+<!-- Short clockwise -->
+<!-- <node pkg="rosbag" type="play" name="rqt_bag_c2" args="-p client1 /home/appuser/data/shared_data/bags/client2/client_recorded_2024-05-06.03-12-41.bag" />   -->
+
+</launch>

@@ -1,0 +1,47 @@
+session_name: COVINS-live-demo-2-agents
+
+options:
+  default-command: /bin/bash
+
+windows:
+- window name: core
+  layout: tiled
+  shell_command_before:
+    - docker exec -it COVINS_demo /bin/bash
+    - su appuser
+    - cd /home/appuser/COVINS_demo/
+    - source devel/setup.bash
+
+  panes:
+    - roscore
+    - sleep 3 && roslaunch covins_backend tf.launch
+    - sleep 3 && rviz -d /home/appuser/COVINS_demo/src/covins/covins_backend/config/covins.rviz
+
+- window_name: important_and_record
+  layout: tiled  
+  shell_command_before:
+    - sleep 8;
+    - docker exec -it COVINS_demo /bin/bash
+    - su appuser
+    - cd /home/appuser/COVINS_demo/
+    - source devel/setup.bash
+
+  panes:
+    - /bin/sshpass -p 'deva' ssh -o StrictHostKeyChecking=no deva-jnx30d-1@192.168.1.11
+    - /bin/sshpass -p 'deva' ssh -o StrictHostKeyChecking=no deva-jnx30d-4@192.168.1.12
+    - rosrun covins_backend covins_backend_node
+    - cd bags
+
+- window_name: cams_and_record
+  layout: tiled
+  shell_command_before:
+    - docker exec -it COVINS_demo /bin/bash
+    - su appuser
+    - cd /home/appuser/COVINS_demo/
+    - source devel/setup.bash
+
+  panes:
+    - /bin/sshpass -p 'deva' ssh -o StrictHostKeyChecking=no deva-jnx30d-1@192.168.1.11 'source /opt/ros/melodic/setup.bash && rosnode kill -a || sleep 2 && ./cam.sh'
+    - /bin/sshpass -p 'deva' ssh -o StrictHostKeyChecking=no deva-jnx30d-4@192.168.1.12 'source /opt/ros/melodic/setup.bash && rosnode kill -a || sleep 2 && ./cam.sh'
+    - /bin/sshpass -p 'deva' ssh -o StrictHostKeyChecking=no deva-jnx30d-1@192.168.1.11
+    - /bin/sshpass -p 'deva' ssh -o StrictHostKeyChecking=no deva-jnx30d-4@192.168.1.12

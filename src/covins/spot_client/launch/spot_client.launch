@@ -1,0 +1,16 @@
+<launch>
+  <arg name="username" default="user" />
+  <arg name="password" default="ruy6ucvnoj4z" />
+  <!-- 50.3 for  coreIO, 80.3 for base -->
+  <arg name="hostname" default="192.168.50.3" />
+  <arg name="camera_name" default="frontleft" />
+
+  <node pkg="spot_client" type="client_node" name="client_node"  ns="spot" output="screen">
+    <param name="username" value="$(arg username)" />
+    <param name="password" value="$(arg password)" />
+    <param name="hostname" value="$(arg hostname)" />
+    <remap from="joint_states" to="/joint_states"/>
+    <remap from="tf" to="/tf"/>
+  </node>
+
+</launch>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+<node pkg="rosbag" type="play" name="rqt_bag_c1" args="-p client1  /home/appuser/COVINS_demo/bags/client1/client_recorded_2022-11-16-10_13_37.bag" />
+<node pkg="rosbag" type="play" name="rqt_bag_c2" args="-p client2  /home/appuser/COVINS_demo/bags/client2/client_recorded_2022-11-16-10_13_37.bag" /> 
+<node pkg="rosbag" type="play" name="rqt_bag_c3" args="-p client3  /home/appuser/COVINS_demo/bags/client3/client_recorded_2022-11-16-10_13_38.bag" /> 
+
+
+</launch>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<launch>
+<!-- COVINS -->
+<node name="covins_backend_node" pkg="covins_backend" type="covins_backend_node" />
+
+<group ns="cvislam">
+    <!--    <node pkg="tf" type="static_transform_publisher" name="linkS_broadcaster" args="0 0 0 -1.571 0 0 world odom 100" /> -->
+    <node pkg="tf" type="static_transform_publisher" name="linkS_broadcaster" args="0 0 0 0 0 0 world odom 100" />
+    <node pkg="tf" type="static_transform_publisher" name="linkAlign_broadcaster" args="20 20 0 -1.571 0 0 world odomAlign 100" />
+</group>
+
+<arg name="voc" default="/home/appuser/COVINS_demo/src/covins/orb_slam3/Vocabulary/ORBvoc.txt" />
+<arg name="cam" default="/home/appuser/COVINS_demo/src/covins/orb_slam3/Examples/ROS/ORB_SLAM3/Intel_D435i_042222071807.yaml" />
+
+<!-- ORB CLIENT 1 -->
+<node pkg="ORB_SLAM3" type="Mono_Inertial" name="ORB_SLAM3_monoi1" args="$(arg voc) $(arg cam)" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@' "> 
+    <remap from="/camera/image_raw" to="/client1/camera/infra1/image_rect_raw"/>
+    <remap from="/imu" to="/client1/camera/imu"/>
+
+</node>
+
+<node pkg="rosbag" type="play" name="rqt_bag_c1" args="-p client1 --wait-for-subscribers /home/appuser/COVINS_demo/bags/client1/client_recorded_2022-11-16-10_13_37.bag">
+</node>
+
+<!-- ORB CLIENT 2 -->
+<node pkg="ORB_SLAM3" type="Mono_Inertial" name="ORB_SLAM3_monoi2" args="$(arg voc) $(arg cam)" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@' "> 
+    <remap from="/camera/image_raw" to="/client2/camera/infra1/image_rect_raw"/>      <!-- "/client2/camera/infra1/image_rect_raw" -->
+    <remap from="/imu" to="/client2/camera/imu"/>
+</node>
+
+<node pkg="rosbag" type="play" name="rqt_bag_c2" args="-p client2 --wait-for-subscribers /home/appuser/COVINS_demo/bags/client2/client_recorded_2022-11-16-10_13_37.bag">
+</node>
+
+
+<!-- VIZ -->
+<node pkg="rviz" type="rviz" name="rviz" args="-d /home/appuser/COVINS_demo/src/covins/covins_backend/config/covins_with_clients.rviz"/>
+</launch>

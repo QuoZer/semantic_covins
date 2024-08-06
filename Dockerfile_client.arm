@@ -1,0 +1,345 @@
+###Setup base
+#
+#Base image can be tricky. In my oppinion you should only use a few base images. Complex ones with 
+#everything usually have special use cases, an in my experience they take more time to understand, 
+#than building one from the ground up.
+#The base iamges I suggest you to use:
+#- ubuntu: https://hub.docker.com/_/ubuntu
+#- osrf/ros:version-desktop-full: https://hub.docker.com/r/osrf/ros
+#- nvidia/cuda: https://hub.docker.com/r/nvidia/cuda
+#- nvidia/l4t-jetpack for jetson: https://ngc.nvidia.com/catalog/containers/nvidia:l4t-jetpack
+#We are mostly not space constrained so a little bigger image with everything is usually better,
+#than a stripped down version.
+
+
+FROM nvcr.io/nvidia/l4t-jetpack:r35.3.1
+#set shell 
+SHELL ["/bin/bash", "-c"]
+#set colors
+ENV BUILDKIT_COLORS=run=green:warning=yellow:error=red:cancel=cyan
+#start with root user
+USER root
+
+###Create new user
+#
+#Creating a user inside the container, so we won't work as root.
+#Setting all setting all the groups and stuff.
+#
+###
+
+#expect build-time argument
+ARG HOST_USER_GROUP_ARG
+#args for build
+ARG COVINS_BUILD_TYPE
+ARG NR_JOBS
+#create group appuser with id 999
+#create group hostgroup with ID from host. This is needed so appuser can manipulate the host files without sudo.
+#create appuser user with id 999 with home; bash as shell; and in the appuser group
+#change password of appuser to admin so that we can sudo inside the container
+#add appuser to sudo, hostgroup and all default groups
+#copy default bashrc and add ROS sourcing
+RUN groupadd -g 999 appuser && \
+    groupadd -g $HOST_USER_GROUP_ARG hostgroup && \
+    useradd --create-home --shell /bin/bash -u 999 -g appuser appuser && \
+    echo 'appuser:admin' | chpasswd && \
+    usermod -aG sudo,hostgroup,plugdev,video,adm,cdrom,dip,dialout appuser && \
+    cp /etc/skel/.bashrc /home/appuser/  
+
+###Install the project
+#
+#If you install multiple project, you should follow the same 
+#footprint for each:
+#- dependencies
+#- pre install steps
+#- install
+#- post install steps
+#
+###
+
+#basic dependencies for everything and ROS
+USER root
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive\
+    apt-get install -y\
+    netbase\
+    git\
+    build-essential\    
+    wget\
+    curl\
+    gdb\
+    lsb-release\
+    sudo
+
+#install ROS1 http://wiki.ros.org/noetic/Installation/Ubuntu
+RUN rm -rf /var/lib/apt/lists/*
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive\
+    apt-get install -y\
+    ros-noetic-desktop-full
+#install ROS tools
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive\
+    apt-get install -y\
+    python3-rosdep\
+    python3-rosinstall\
+    python3-rosinstall-generator\
+    python3-catkin-tools\
+    python3-wstool
+RUN rosdep init
+RUN rosdep update
+#ros sourcing
+
+#install ROS2 https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html
+RUN rm -rf /var/lib/apt/lists/*
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive\
+    apt-get install -y \
+    ros-foxy-desktop \
+    python3-argcomplete \
+    ros-dev-tools
+
+#install ros1_bridge
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive\
+    apt-get install -y \
+    ros-foxy-ros1-bridge
+
+#if you need special (non std_msg) messages forwarded between ROS1 and ROS2, you should read this: https://github.com/ros2/ros1_bridge
+
+#ros sourcing
+RUN echo "source /opt/ros/noetic/setup.bash" >> /home/appuser/.bashrc
+
+#update local port list so it will be in the forwarded range
+USER root
+RUN echo "net.ipv4.ip_local_port_range = 21000 22000" >> /etc/sysctl.conf && \
+    sysctl -p /etc/sysctl.conf .
+
+#install wireshark terminal for debugging https://www.wireshark.org/docs/wsug_html_chunked/AppToolstshark
+#basic dependencies for everything
+USER root
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive\
+    apt-get install -y\
+    tshark \
+    nano \
+    net-tools \
+    iputils-ping \
+    netbase\
+    git\
+    build-essential\    
+    wget\
+    curl\
+    gdb
+
+
+#install for catkin build
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y \
+    python3-catkin-tools \
+    python3-pip
+
+#install deps
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y \
+    ros-noetic-joy \
+    ros-noetic-teleop-twist-joy\
+    ros-noetic-twist-mux \
+    python3-catkin-tools\
+    python3-wstool\
+    python3-catkin-tools\
+    build-essential\
+    libpcap-dev \
+    libpthread-stubs0-dev\
+    libsuitesparse-dev\
+    libyaml-cpp-dev\
+    libomp-dev\
+    libglew-dev\
+    libtool\
+    doxygen\
+    unzip\
+    apache2\
+    apache2-utils\
+    sshpass
+
+# install sdk
+USER appuser
+# avoids grpc problems on jetson  
+RUN pip3 install -U pip  
+RUN python3 -m pip install\
+    bosdyn-client==4.0.2\
+    bosdyn-mission==4.0.2\
+    bosdyn-choreography-client==4.0.2\
+    bosdyn-orbit==4.0.2\
+    bosdyn-api==4.0.2\
+    bosdyn-core==4.0.2\
+    transforms3d
+
+#install spot ros1 https://github.com/heuristicus/spot_ros
+# COPY --chown=appuser:appuser ./src/spot_ros /home/appuser/COVINS_demo/src/spot_ros
+RUN mkdir -p /home/appuser/COVINS_demo/src && \
+    cd /home/appuser/COVINS_demo/src && \
+    git clone https://github.com/heuristicus/spot_ros.git && \
+    sed -i '3d' spot_ros/.gitmodules && \
+    sed -i '2aurl = https://github.com/bdaiinstitute/spot_wrapper.git' spot_ros/.gitmodules && \
+    git clone https://github.com/ros-visualization/interactive_marker_twist_server.git -b kinetic-devel
+RUN cd /home/appuser/COVINS_demo/src/spot_ros && \
+    git config --global --add safe.directory /home/appuser/COVINS_demo/src/spot_ros && \
+    git submodule init && \
+    git submodule update
+RUN cd /home/appuser/COVINS_demo/src/spot_ros && \
+    pip3 install -e spot_wrapper 
+RUN cd /home/appuser/COVINS_demo && \
+    catkin config --extend /opt/ros/noetic/ &&\
+    catkin config --merge-devel &&\
+    catkin config --cmake-args -DCMAKE_BUILD_TYPE=$COVINS_BUILD_TYPE &&\
+    catkin build
+
+## COVINS clients 
+
+#create dir
+RUN mkdir -p /home/appuser/COVINS_demo/src/covins
+#copy only those files that are needed for the dependencies
+COPY --chown=appuser:appuser ./src/covins/dependencies.rosinstall /home/appuser/COVINS_demo/src/covins/dependencies.rosinstall
+COPY --chown=appuser:appuser ./src/covins/fix_eigen_deps.sh /home/appuser/COVINS_demo/src/covins/fix_eigen_deps.sh
+#clone dependencies 
+RUN cd /home/appuser/COVINS_demo &&\
+    catkin init &&\
+    cd src && \
+    wstool init && \
+    wstool merge covins/dependencies.rosinstall && \
+    wstool up && \
+    chmod +x covins/fix_eigen_deps.sh && \
+    ./covins/fix_eigen_deps.sh && \
+    cd vision_opencv && \
+    git checkout noetic && \
+    cd cv_bridge && \
+    sed -i '4d' CMakeLists.txt && \
+    sed -i '3afind_package(catkin REQUIRED COMPONENTS rosconsole sensor_msgs opencv3_catkin)' CMakeLists.txt && \
+    sed -i '20d' CMakeLists.txt && \
+    sed -i '20d' CMakeLists.txt && \
+    sed -i '20d' CMakeLists.txt && \
+    sed -i '20d' CMakeLists.txt && \
+    sed -i '20d' CMakeLists.txt && \
+    sed -i '20d' CMakeLists.txt && \
+    sed -i '19aset(_opencv_version 3)' CMakeLists.txt
+
+#install dependencies
+#build catkin dependencies before copying files
+RUN cd /home/appuser/COVINS_demo && \
+    catkin build -j$NR_JOBS\
+    eigen_catkin\
+    opencv3_catkin\
+    catkin_simple\
+    doxygen_catkin\
+    gflags_catkin\
+    protobuf_catkin\
+    suitesparse\
+    yaml_cpp_catkin\
+    glog_catkin\
+    eigen_checks\
+    ceres_catkin\
+    minkindr\
+    aslam_cv_common\
+    aslam_cv_cameras\
+    robopt_open
+    # opengv\
+
+# TODO: move up 
+USER root       
+RUN apt-get install -y python3-dev  python-dev  ros-noetic-realsense2-camera
+USER appuser
+#install cv_bridge
+RUN cd /home/appuser/COVINS_demo && \
+    catkin build -j$NR_JOBS cv_bridge
+#install pangolin
+RUN mkdir -p /home/appuser/COVINS_demo/build_thirdparty/pangolin/lib && \
+    mkdir -p /home/appuser/COVINS_demo/build_thirdparty/pangolin/bin && \
+    cd /home/appuser/COVINS_demo/build_thirdparty/pangolin && \
+    source /home/appuser/COVINS_demo/devel/setup.bash && \
+    cmake -DCMAKE_INSTALL_PREFIX=/home/appuser/COVINS_demo/build_thirdparty/pangolin /home/appuser/COVINS_demo/src/pangolin -DCMAKE_BUILD_TYPE=$COVINS_BUILD_TYPE && \
+    make -j$NR_JOBS && \
+    make install
+#copy and unzip voc file
+COPY --chown=appuser:appuser ./src/covins/orb_slam3/Vocabulary/ORBvoc.txt.tar.gz /home/appuser/COVINS_demo/src/covins/orb_slam3/Vocabulary/ORBvoc.txt.tar.gz
+RUN mkdir /home/appuser/COVINS_demo/voc && \
+    cd /home/appuser/COVINS_demo/voc && \
+    tar -xf /home/appuser/COVINS_demo/src/covins/orb_slam3/Vocabulary/ORBvoc.txt.tar.gz
+#copy and install DBoW2
+COPY --chown=appuser:appuser ./src/covins/covins_backend/thirdparty/DBoW2 /home/appuser/COVINS_demo/src/covins/covins_backend/thirdparty/DBoW2   
+RUN mkdir -p /home/appuser/COVINS_demo/build_thirdparty/DBoW2/lib && \
+    cd /home/appuser/COVINS_demo/build_thirdparty/DBoW2 && \
+    source /home/appuser/COVINS_demo/devel/setup.bash && \
+    cmake /home/appuser/COVINS_demo/src/covins/covins_backend/thirdparty/DBoW2 -DCMAKE_BUILD_TYPE=$COVINS_BUILD_TYPE && \
+    make -j$NR_JOBS
+#copy and install g2o
+COPY --chown=appuser:appuser ./src/covins/orb_slam3/Thirdparty/g2o /home/appuser/COVINS_demo/src/covins/orb_slam3/Thirdparty/g2o
+RUN mkdir -p /home/appuser/COVINS_demo/build_thirdparty/g2o/lib && \
+    mkdir -p /home/appuser/COVINS_demo/build_thirdparty/g2o/bin && \
+    cd /home/appuser/COVINS_demo/build_thirdparty/g2o && \
+    source /home/appuser/COVINS_demo/devel/setup.bash && \
+    cmake -DPROJECT_INSTALL_DIR=/home/appuser/COVINS_demo/build_thirdparty/g2o /home/appuser/COVINS_demo/src/covins/orb_slam3/Thirdparty/g2o -DCMAKE_BUILD_TYPE=$COVINS_BUILD_TYPE && \
+    make -j$NR_JOBS
+
+# copy and install covins_comm 
+# opengv fails to build with a segfault - skipping covins_backend 
+COPY --chown=appuser:appuser ./src/covins/covins_backend /home/appuser/COVINS_demo/src/covins/covins_backend
+COPY --chown=appuser:appuser ./src/covins/covins_comm /home/appuser/COVINS_demo/src/covins/covins_comm
+RUN cd /home/appuser/COVINS_demo && \
+    catkin build -j4 covins_comm
+# #copy and install ORB_SLAM3
+COPY --chown=appuser:appuser ./src/covins /home/appuser/COVINS_demo/src/covins
+RUN mkdir -p /home/appuser/COVINS_demo/build_thirdparty/orb_slam3 && \
+    cd /home/appuser/COVINS_demo/build_thirdparty/orb_slam3 && \
+    source /home/appuser/COVINS_demo/devel/setup.bash && \
+    cmake -DPROJECT_INSTALL_DIR=/home/appuser/COVINS_demo/build_thirdparty/orb_slam3 /home/appuser/COVINS_demo/src/covins/orb_slam3 -DCMAKE_BUILD_TYPE=$COVINS_BUILD_TYPE && \
+    make -j$NR_JOBS
+#install ORB_SLAM3 ROS
+RUN cd /home/appuser/COVINS_demo && \
+    catkin build -j$NR_JOBS ORB_SLAM3
+#delete source dirs so that we can connect them as a volume.
+# RUN rm -r /home/appuser/COVINS_demo/src/covins
+
+# install semantic node and copy engines | 
+RUN mkdir -p /home/appuser/COVINS_demo/src/covins/sam_node
+COPY --chown=appuser:appuser ./src/covins/sam_node /home/appuser/COVINS_demo/src/covins/sam_node
+RUN cd /home/appuser/COVINS_demo &&\
+    catkin build -j$NR_JOBS sam_node
+
+USER root
+RUN apt-get install -y  software-properties-common
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE 
+RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
+RUN apt-get install -y --no-install-recommends \
+        libopenblas-dev \
+        libopenmpi-dev \
+        openmpi-bin \
+        openmpi-common \
+        gfortran \
+        libomp-dev \
+        librealsense2-utils \
+        librealsense2-dev
+USER appuser
+
+RUN python3 -m pip install --no-cache https://developer.download.nvidia.cn/compute/redist/jp/v511/pytorch/torch-2.0.0+nv23.05-cp38-cp38-linux_aarch64.whl
+RUN pip3 install torchvision==0.15.1
+# fix "cannot allocate memory in static TLS block" (https://forums.developer.nvidia.com/t/error-cannot-allocate-memory-in-static-tls-blocjetsonk/280430)
+RUN export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu/tegra/
+# install torch2tensorrt (can be substituted by torch_tensorrt)
+RUN mkdir -p /home/appuser/ && \
+    cd /home/appuser/ && \
+    git clone https://github.com/NVIDIA-AI-IOT/torch2trt
+    # cd torch2trt && \
+    # python3 setup.py develop                      <-- doesn't work in docker build because of some cuda stuff 
+                                                #       on the actual jetson itself it does wotk, but has no access to dist-packages for some reason (solved with chown but seems like a hack)
+
+
+#copy config files
+COPY --chown=appuser:appuser ./config /home/appuser/COVINS_demo/src/spot_ros/spot_driver/launch
+
