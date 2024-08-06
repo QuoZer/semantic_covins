@@ -1,8 +1,29 @@
+# Spot COVINS client
+
+This branch aims to prepare the semantic covins project for deployment, including on Spot's hardware. It contains all additions of the `semantic` branch, but organizes it better and includes some Spot related code.   The two `Dockerfile_client` files are intended to be used on (spot) clients. They contain dependencies and sources for the semantic segmentation network, spot wrapper, ORB_SLAM and RealSense. The source volume mounting was commented out for ease of deployment on CORE I/O. The arm64 version of the container was more in focus as it is more relevant to the target hardware, therefore the x86 version lacks some CUDA and PyTorch dependencies. A new launch file was introduced to start all three components of a client. 
+
+# Semantic COVINS 
+
+## Semantic usage 
+
+See in `docs/Semantic_COVINS.md`
+
 # TODOs
 Implement:
 - [x] KF counter
 - [x] When optim runs after LC detection--> print
 - [x] Place recognition on which agent?
+- [x] Merge changes from main
+- [x] Remove irrelevent dependencies
+- Voxblox integration
+    - [x] Autostart Voxblox
+    - or
+    - [ ] Deeper backend Voxblox integration
+- [x] Include the semantic segmentation node 
+- [X] Integrate mapper into the pipeline 
+- [ ] Fully document the changes, parameters and functionality 
+- [ ] Make the semantics mode optional (done on the front-end side, needs work on viz side)
+- [ ] Clean up the semantic_segmentation container - no need to keep the whole ws 
 
 Test:
 - [x] placerec.cov_consistency_thres: 2
@@ -24,55 +45,7 @@ Test:
 - [ ] placerec.consecutive_loop_dist: moore ; placerec.min_loop_dist: moore
 - [ ] clients on different machine
 
-
-All in all: far from consistent.
-
-
-### On a new development branch:
-
-Implement:
-
-- [x] Build separation
-
-    - TODO: g20 CMAKELists.txt 78th line checkup (config.h.in)
-    - run_docker.sh volume check
-    - ORB voc location update for ORB_SLAM
-
-- [x] Only one vocab
-- [x] Check if it can work with DBoW only from covins (orb_slam3 and covins both had DoBW2 but they were different versions.)
-- [ ] Attila's fixes
-- [ ] Webserver cloud publishing to different if
-- [ ] Webserver cloud publishing to new thread
-- [x] remove install script, and have it in Dockerfile
-
-Test:
-
-- ORB client params
-- 
-
-New features
-- Dockerfile for jetson
-- Add semantics
-
-# Spot COVINS client
-
-This branch aims to prepare the semantic covins project for deployment, including on Spot's hardware. It contains all additions of the `semantic` branch, but organizes it better and includes some Spot related code.   The two `Dockerfile_client` files are intended to be used on (spot) clients. They contain dependencies and sources for the semantic segmentation network, spot wrapper, ORB_SLAM and RealSense. The source volume mounting was commented out for ease of deployment on CORE I/O. The arm64 version of the container was more in focus as it is more relevant to the target hardware, therefore the x86 version lacks some CUDA and PyTorch dependencies. A new launch file was introduced to start all three components of a client. 
-
-# Semantic COVINS 
-
-## Semantic TODO:
-
-- [x] Merge changes from main
-- [x] Remove irrelevent dependencies
-- Voxblox integration
-    - [x] Autostart Voxblox
-    - or
-    - [ ] Deeper backend Voxblox integration
-- [x] Include the semantic segmentation node 
-- [X] Integrate mapper into the pipeline 
-- [ ] Fully document the changes, parameters and functionality 
-- [ ] Make the semantics mode optional (done on the front-end side, needs work on viz side)
-- [ ] Clean up the semantic_segmentation container - no need to keep the whole ws 
+Fix:
 - Know issues:
     - [ ] The rotation node does not affect all published messages breaking visualizations and mapper. 
     - [ ] Voxblox ESDF is not cleared automatically. Consequitive calls to the post-processing service contribute to the same ESDF unless Voxblox is restarted manually. 
@@ -80,9 +53,9 @@ This branch aims to prepare the semantic covins project for deployment, includin
     - [ ] Mapper is included as a system-wide python package requiring re-installation on any edits.
     - [ ] Many Mapper parameters are not exposed to the interface.
 
-## Semantic usage 
 
-See in `docs/Semantic_COVINS.md`
+All in all: far from consistent.
+
 
 # COVINS Demo
 Copied and updated from readme of covins. Original readme remains in src/covins.
