@@ -1,14 +1,12 @@
-# Spot COVINS client
+# Semantic COVINS
 
-This branch aims to prepare the semantic covins project for deployment, including on Spot's hardware. It contains all additions of the `semantic` branch, but organizes it better and includes some Spot related code.   The two `Dockerfile_client` files are intended to be used on (spot) clients. They contain dependencies and sources for the semantic segmentation network, spot wrapper, ORB_SLAM and RealSense. The source volume mounting was commented out for ease of deployment on CORE I/O. The arm64 version of the container was more in focus as it is more relevant to the target hardware, therefore the x86 version lacks some CUDA and PyTorch dependencies. A new launch file was introduced to start all three components of a client. 
+This repo contains code developed for a Master's thesis on "Enhancing Collaborative SLAM with semantic information for human-readable mapping" at HUN-REN SZTAKI. It is based on the [COVINS](https://github.com/VIS4ROB-lab/covins) project and uses [EfficientVIT](https://github.com/mit-han-lab/efficientvit) for semantic information extraction. The project aims to provide a more human-readable map by adding semantic information and performing floorplan extraction. Docker containers are prepared for easy deployment on Jetson Xavier NX platform (including Spot's Core I/O module).  They contain dependencies and sources for the semantic segmentation network, spot wrapper, ORB_SLAM and RealSense. The source volume mounting was commented out for ease of deployment on CORE I/O. The arm64 version of the container was more in focus as it is more relevant to the target hardware, therefore the x86 version lacks some CUDA and PyTorch dependencies.
 
-# Semantic COVINS 
 
-## Semantic usage 
-
-See in `docs/Semantic_COVINS.md`
+See more in `docs/Semantic_COVINS.md`
 
 # TODOs
+
 Implement:
 - [x] KF counter
 - [x] When optim runs after LC detection--> print
