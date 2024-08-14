@@ -81,6 +81,7 @@ RUN apt-get update && \
     sshpass\
     python3-pip\
     python3-tk
+
 USER appuser
 #create dir
 RUN mkdir -p /home/appuser/COVINS_demo/src/covins
@@ -118,6 +119,10 @@ RUN cd /home/appuser/COVINS_demo &&\
 #install dependencies
 #build catkin dependencies before copying files
 RUN cd /home/appuser/COVINS_demo && \
+    catkin build -j2 \
+    opengv
+
+RUN cd /home/appuser/COVINS_demo && \
     catkin build -j$NR_JOBS\
     eigen_catkin\
     opencv3_catkin\
@@ -127,7 +132,6 @@ RUN cd /home/appuser/COVINS_demo && \
     protobuf_catkin\
     suitesparse\
     yaml_cpp_catkin\
-    opengv\
     glog_catkin\
     eigen_checks\
     ceres_catkin\
@@ -193,10 +197,21 @@ RUN cd /home/appuser/COVINS_demo/src && \
     wstool update && \
     catkin build -j$NR_JOBS voxblox_ros 
 
-RUN pip3 install scikit-image && \
+RUN pip3 install scikit-image \
                  open3d
-#install and configure apache
+
+#install ros2
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
 USER root
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+RUN apt update && \
+    DEBIAN_FRONTEND=noninteractive apt install -y ros-foxy-desktop
+
+
+#install and configure apache
 RUN mkdir -p /var/www/pointmap.net/html
 COPY ./web/pointmap.net.conf /etc/apache2/sites-available/pointmap.net.conf
 COPY ./web/pointmap.net /var/www/pointmap.net/html 

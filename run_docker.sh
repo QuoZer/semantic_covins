@@ -1,9 +1,9 @@
 #!/bin/bash
 #parameters
-bag_folder="/home/${USER}/repos/covins_demo/bags"
-output_folder="/home/${USER}/repos/covins_demo/output"
-source_folder="/home/${USER}/repos/covins_demo/src/covins/"
-script_folder="/home/${USER}/repos/covins_demo/src/covins/scripts"
+bag_folder="/home/${USER}/repos/semantic_covins/bags"
+output_folder="/home/${USER}/repos/semantic_covins/output"
+source_folder="/home/${USER}/repos/semantic_covins/src/covins/"
+script_folder="/home/${USER}/repos/semantic_covins/src/covins/scripts"
 container_name="COVINS_demo"
 image_name="ros-semantic-covins-demo"
 image_tag="latest"
