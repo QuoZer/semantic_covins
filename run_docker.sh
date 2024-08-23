@@ -67,18 +67,18 @@ then
 else
     echo "Container does not exist. Creating it."
     #The container is started with the apachectl -D FOREGROUND command. This needs sudo, so the end of the dockerfile is in sudo user.
+        # --volume ${source_folder}covins_backend:/home/appuser/COVINS_demo/src/covins/covins_backend \
+        # --volume ${source_folder}covins_comm/config:/home/appuser/COVINS_demo/src/covins/covins_comm/config \
+        # --volume ${source_folder}covins_comm/include:/home/appuser/COVINS_demo/src/covins/covins_comm/include \
+        # --volume ${source_folder}covins_comm/src:/home/appuser/COVINS_demo/src/covins/covins_comm/src \
+        # --volume ${source_folder}orb_slam3/src:/home/appuser/COVINS_demo/src/covins/orb_slam3/src \
+        # --volume ${source_folder}orb_slam3/include:/home/appuser/COVINS_demo/src/covins/orb_slam3/include \
+        # --volume ${source_folder}orb_slam3/Examples:/home/appuser/COVINS_demo/src/covins/orb_slam3/Examples \
     docker run \
         --env DISPLAY=${DISPLAY} \
         --volume /tmp/.X11-unix:/tmp/.X11-unix \
         --volume $bag_folder:/home/appuser/COVINS_demo/bags \
         --volume ${output_folder}/map_data:/home/appuser/COVINS_demo/src/covins/covins_backend/output/map_data \
-        --volume ${source_folder}covins_backend:/home/appuser/COVINS_demo/src/covins/covins_backend \
-        --volume ${source_folder}covins_comm/config:/home/appuser/COVINS_demo/src/covins/covins_comm/config \
-        --volume ${source_folder}covins_comm/include:/home/appuser/COVINS_demo/src/covins/covins_comm/include \
-        --volume ${source_folder}covins_comm/src:/home/appuser/COVINS_demo/src/covins/covins_comm/src \
-        --volume ${source_folder}orb_slam3/src:/home/appuser/COVINS_demo/src/covins/orb_slam3/src \
-        --volume ${source_folder}orb_slam3/include:/home/appuser/COVINS_demo/src/covins/orb_slam3/include \
-        --volume ${source_folder}orb_slam3/Examples:/home/appuser/COVINS_demo/src/covins/orb_slam3/Examples \
         --volume $script_folder:/home/appuser/COVINS_demo/src/covins/scripts \
         --volume ${PWD}/.vscode:/home/appuser/COVINS_demo/.vscode \
         --volume ${source_folder}:/home/appuser/COVINS_demo/src/covins/ \
